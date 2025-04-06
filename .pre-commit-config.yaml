@@ -20,3 +20,10 @@ repos:
         args:
           - --check
           - --diff
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        types: [python]
