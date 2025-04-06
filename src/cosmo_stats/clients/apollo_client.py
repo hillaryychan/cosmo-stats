@@ -1,22 +1,34 @@
-import requests
+from httpx import AsyncClient
 
-from cosmo_stats.clients.models import ObjektList, ObjektMetadata
-
-OBJEKTS_PATH = "https://apollo.cafe/api/objekts?artist=tripleS&sort=newest&season={season}&collectionNo={collections}&page={page}"
-METADATA_PATH = "https://apollo.cafe/api/objekts/metadata/{slug}"
+from cosmo_stats.clients.models import ObjektCollectionMetadata, ObjektList
+from cosmo_stats.enums import Season
 
 
-def fetch_objekts(season: str, collections: list[str], page: int) -> ObjektList:
-    path = OBJEKTS_PATH.format(
-        season=season, collections=",".join(collections), page=page
-    )
-    resp = requests.get(path, timeout=30)
-    data = resp.json()
-    return ObjektList.model_validate(data)
+class ApolloApiClient:
+    DEFAULT_TIMEOUT = 30.0
+
+    def __init__(self) -> None:
+        self._client = AsyncClient(timeout=self.DEFAULT_TIMEOUT)
+
+    @property
+    def base_url(self) -> str:
+        return "https://apollo.cafe"
+
+    async def get_objekts(
+        self, season: Season, collections: list[str], page: int = 0
+    ) -> ObjektList:
+        resp = await self._client.get(
+            f"{self.base_url}/api/objekts?artist=tripleS&sort=newest&season={season}&collectionNo={','.join(collections)}&page={page}"
+        )
+        data = resp.json()
+        return ObjektList.model_validate(data)
+
+    async def get_objekt_collection_metadata(
+        self, slug: str
+    ) -> ObjektCollectionMetadata:
+        resp = await self._client.get(f"{self.base_url}/api/objekts/metadata/{slug}")
+        data = resp.json()
+        return ObjektCollectionMetadata.model_validate(data)
 
 
-def fetch_objekt_metadata(slug: str) -> ObjektMetadata:
-    path = METADATA_PATH.format(slug=slug)
-    resp = requests.get(path, timeout=30)
-    data = resp.json()
-    return ObjektMetadata.model_validate(data)
+default_apollo_api_client = ApolloApiClient()

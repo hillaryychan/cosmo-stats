@@ -29,14 +29,14 @@ class ObjektList(ApiModel):
     objekts: list[Objekt]
 
 
-class ObjektMetadataData(ApiModel):
+class ObjektMetadata(ApiModel):
     id: int
     collection_id: str
     description: str
 
 
-class ObjektMetadata(ApiModel):
-    metadata: ObjektMetadataData
+class ObjektCollectionMetadata(ApiModel):
+    metadata: ObjektMetadata
     total: str
     transferable: str
     percentage: str
