@@ -1,0 +1,17 @@
+[project]
+name = "cosmo-stats"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Hillary Chan", email = "hillary.chan91@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+cosmo-stats = "cosmo_stats:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
