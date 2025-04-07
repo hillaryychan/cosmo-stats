@@ -1,7 +1,7 @@
 from httpx import AsyncClient
 
 from cosmo_stats.clients.models import ObjektCollectionMetadata, ObjektList
-from cosmo_stats.enums import Season
+from cosmo_stats.enums import Artist, Season
 
 
 class ApolloApiClient:
@@ -15,10 +15,10 @@ class ApolloApiClient:
         return "https://apollo.cafe"
 
     async def get_objekts(
-        self, season: Season, collections: list[str], page: int = 0
+        self, artist: Artist, season: Season, collections: list[str], page: int = 0
     ) -> ObjektList:
         resp = await self._client.get(
-            f"{self.base_url}/api/objekts?artist=tripleS&sort=newest&season={season}&collectionNo={','.join(collections)}&page={page}"
+            f"{self.base_url}/api/objekts?artist={artist}&sort=newest&season={season}&collectionNo={','.join(collections)}&page={page}"
         )
         data = resp.json()
         return ObjektList.model_validate(data)

@@ -3,7 +3,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 from pydantic.alias_generators import to_camel
 
-from cosmo_stats.enums import ObjektClass, Season, TripleSMember
+from cosmo_stats.enums import ArtmsMember, ObjektClass, Season, TripleSMember
 
 
 class ApiModel(BaseModel):
@@ -16,7 +16,7 @@ class Objekt(ApiModel):
     slug: str
     collection_id: str
     season: Season
-    member: TripleSMember
+    member: TripleSMember | ArtmsMember
     collection_no: str
     objekt_class: ObjektClass = Field(alias="class")
     como_amount: int

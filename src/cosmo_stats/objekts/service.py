@@ -5,7 +5,7 @@ import pandas as pd
 
 from cosmo_stats.clients.apollo_client import ApolloApiClient, default_apollo_api_client
 from cosmo_stats.clients.models import Objekt
-from cosmo_stats.enums import Season
+from cosmo_stats.enums import Artist, Season
 from cosmo_stats.objekts.models import ObjektCollectionData
 
 
@@ -14,12 +14,12 @@ class ObjektService:
         self._api_client = api_client
 
     async def _get_objekts(
-        self, season: Season, collections: list[str]
+        self, artist: Artist, season: Season, collections: list[str]
     ) -> list[Objekt]:
         objekts = []
         page = 0
         while True:
-            resp = await self._api_client.get_objekts(season, collections, page)
+            resp = await self._api_client.get_objekts(artist, season, collections, page)
             objekts.extend(resp.objekts)
             if not resp.has_next or resp.next_start_after is None:
                 break
@@ -64,9 +64,13 @@ class ObjektService:
         return stats_df.sort_values(by="total", ascending=False)
 
     async def get_objekt_sales_stats(
-        self, season: Season, collections: list[str]
+        self, artist: Artist, season: Season, collections: list[str]
     ) -> None:
-        objekts = await self._get_objekts(season, collections)
+        objekts = await self._get_objekts(artist, season, collections)
+        if len(objekts) == 0:
+            print("No objekts found")
+            return
+
         data = await self._get_objekt_collection_data(objekts)
         stats = self._get_objekt_sales_stats_dataframe(data)
         print(stats)
