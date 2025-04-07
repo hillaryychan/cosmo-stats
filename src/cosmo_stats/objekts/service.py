@@ -13,7 +13,9 @@ class ObjektService:
     def __init__(self, api_client: ApolloApiClient) -> None:
         self._api_client = api_client
 
-    async def get_objekts(self, season: Season, collections: list[str]) -> list[Objekt]:
+    async def _get_objekts(
+        self, season: Season, collections: list[str]
+    ) -> list[Objekt]:
         objekts = []
         page = 0
         while True:
@@ -25,7 +27,7 @@ class ObjektService:
 
         return objekts
 
-    async def get_objekt_collection_data(
+    async def _get_objekt_collection_data(
         self, objekts: list[Objekt]
     ) -> list[ObjektCollectionData]:
         data = []
@@ -49,7 +51,7 @@ class ObjektService:
 
         return data
 
-    def get_objekt_sales_stats(
+    def _get_objekt_sales_stats_dataframe(
         self, objekts_data: list[ObjektCollectionData]
     ) -> pd.DataFrame:
         objekts_df = pd.DataFrame(
@@ -60,6 +62,14 @@ class ObjektService:
         )
         stats_df.insert(0, "total", stats_df.sum(axis=1))
         return stats_df.sort_values(by="total", ascending=False)
+
+    async def get_objekt_sales_stats(
+        self, season: Season, collections: list[str]
+    ) -> None:
+        objekts = await self._get_objekts(season, collections)
+        data = await self._get_objekt_collection_data(objekts)
+        stats = self._get_objekt_sales_stats_dataframe(data)
+        print(stats)
 
 
 default_objekt_service = ObjektService(default_apollo_api_client)
