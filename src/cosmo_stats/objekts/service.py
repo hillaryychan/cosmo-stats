@@ -57,9 +57,15 @@ class ObjektService:
         objekts_df = pd.DataFrame(
             [objekt_data.model_dump() for objekt_data in objekts_data]
         )
-        stats_df = pd.pivot_table(
-            objekts_df, values="total", index=["member"], columns=["collection_no"]
+        # generate collection_id from season and collection number
+        objekts_df["collection_id"] = objekts_df.apply(
+            lambda x: x["season"][0] + x["collection_no"], axis=1
         )
+        # pivot table s.t. collection_ids are columns
+        stats_df = pd.pivot_table(
+            objekts_df, values="total", index=["member"], columns=["collection_id"]
+        )
+        # calculate total sales of collection_ids per member
         stats_df.insert(0, "total", stats_df.sum(axis=1))
         return stats_df.sort_values(by="total", ascending=False)
 
