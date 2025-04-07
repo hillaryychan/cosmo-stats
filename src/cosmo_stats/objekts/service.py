@@ -1,3 +1,6 @@
+import asyncio
+from itertools import batched
+
 import pandas as pd
 
 from cosmo_stats.clients.apollo_client import ApolloApiClient, default_apollo_api_client
@@ -26,7 +29,8 @@ class ObjektService:
         self, objekts: list[Objekt]
     ) -> list[ObjektCollectionData]:
         data = []
-        for objekt in objekts:
+
+        async def get_objekt_collection_data_task(objekt: Objekt) -> None:
             metadata = await self._api_client.get_objekt_collection_metadata(
                 objekt.slug
             )
@@ -38,6 +42,11 @@ class ObjektService:
                     total=int(metadata.total),
                 )
             )
+
+        for batch in batched(objekts, 50, strict=False):
+            tasks = map(get_objekt_collection_data_task, batch)
+            await asyncio.gather(*tasks)
+
         return data
 
     def get_objekt_sales_stats(
