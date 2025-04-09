@@ -4,6 +4,9 @@ import sys
 
 from cosmo_stats.enums import Artist, Season
 from cosmo_stats.objekts.service import default_objekt_service
+from cosmo_stats.signals import register_signal_handlers
+
+register_signal_handlers()
 
 
 class CosmoStatsArgsNamespace:
