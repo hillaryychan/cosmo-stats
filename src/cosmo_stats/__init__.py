@@ -36,6 +36,19 @@ def main() -> None:
     )
     parser.parse_args(sys.argv[1:], namespace=CosmoStatsArgsNamespace)
 
+    if args.collection_no is None:
+        print(
+            "No collections provided. "
+            "This will collect data for all collections in the season."
+        )
+        while True:
+            confirmation = input("Are you sure you want to do this [Y/n]? ")
+            match confirmation.lower():
+                case "yes" | "y":
+                    break
+                case "no" | "n":
+                    sys.exit()
+
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
             args.artist, args.season, args.collection_no
