@@ -9,6 +9,7 @@ from cosmo_stats.objekts.service import default_objekt_service
 class CosmoStatsArgsNamespace:
     artist: Artist
     season: Season
+    collection_no: str | None
 
 
 def main() -> None:
@@ -27,16 +28,16 @@ def main() -> None:
         type=str.capitalize,
         help="The season of the objekts",
     )
+    parser.add_argument(
+        "-c",
+        "--collection-no",
+        type=str.upper,
+        help="The collections to collect data for, e.g. 117Z,118Z,119Z,120Z",
+    )
     parser.parse_args(sys.argv[1:], namespace=CosmoStatsArgsNamespace)
 
-    # 1st edition
-    collections = ["101Z", "102Z", "103Z", "103Z", "105Z", "106Z", "107Z", "108Z"]
-    # 2nd edition
-    collections = ["109Z", "110Z", "111Z", "112Z", "113Z", "114Z", "115Z", "116Z"]
-    # 3rd edition
-    collections = ["117Z", "118Z", "119Z", "120Z"]
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
-            args.artist, args.season, collections
+            args.artist, args.season, args.collection_no
         )
     )

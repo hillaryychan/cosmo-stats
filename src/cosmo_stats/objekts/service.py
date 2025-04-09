@@ -14,12 +14,14 @@ class ObjektService:
         self._api_client = api_client
 
     async def _get_objekts(
-        self, artist: Artist, season: Season, collections: list[str]
+        self, artist: Artist, season: Season, collection_no: str | None
     ) -> list[Objekt]:
         objekts = []
         page = 0
         while True:
-            resp = await self._api_client.get_objekts(artist, season, collections, page)
+            resp = await self._api_client.get_objekts(
+                artist, season, collection_no, page
+            )
             objekts.extend(resp.objekts)
             if not resp.has_next or resp.next_start_after is None:
                 break
@@ -70,9 +72,9 @@ class ObjektService:
         return stats_df.sort_values(by="total", ascending=False)
 
     async def get_objekt_sales_stats(
-        self, artist: Artist, season: Season, collections: list[str]
+        self, artist: Artist, season: Season, collection_no: str | None
     ) -> None:
-        objekts = await self._get_objekts(artist, season, collections)
+        objekts = await self._get_objekts(artist, season, collection_no)
         if len(objekts) == 0:
             print("No objekts found")
             return
