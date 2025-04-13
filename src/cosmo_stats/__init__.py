@@ -2,7 +2,7 @@ import argparse
 import asyncio
 import sys
 
-from cosmo_stats.enums import Artist, Season, StatsOutput
+from cosmo_stats.enums import Artist, Edition, Season, StatsOutput
 from cosmo_stats.objekts.service import default_objekt_service
 from cosmo_stats.signals import register_signal_handlers
 
@@ -13,6 +13,7 @@ class CosmoStatsArgsNamespace:
     artist: Artist
     season: Season
     collection_no: str | None
+    edition: Edition
     output: StatsOutput
 
 
@@ -39,6 +40,12 @@ def main() -> None:
         help="The collections to collect data for, e.g. 117Z,118Z,119Z,120Z",
     )
     parser.add_argument(
+        "--edition",
+        choices=[edition.value for edition in Edition],
+        type=Edition,
+        help="The collections to collect data for, e.g. 117Z,118Z,119Z,120Z",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         choices=[report.value for report in StatsOutput],
@@ -48,7 +55,7 @@ def main() -> None:
     )
     parser.parse_args(sys.argv[1:], namespace=CosmoStatsArgsNamespace)
 
-    if args.collection_no is None:
+    if args.collection_no is None and args.edition is None:
         print(
             "No collections provided. "
             "This will collect data for all collections in the season."
@@ -60,9 +67,14 @@ def main() -> None:
                     break
                 case "no" | "n" | "":
                     sys.exit()
+    if args.collection_no is not None and args.edition is not None:
+        sys.exit("Provide either --collection-no or --edition not both")
 
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
-            args.artist, args.season, args.collection_no, args.output
+            args.artist,
+            args.season,
+            args.collection_no or args.edition.collection_no,
+            args.output,
         )
     )
