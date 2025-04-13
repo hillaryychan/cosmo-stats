@@ -2,7 +2,7 @@ import argparse
 import asyncio
 import sys
 
-from cosmo_stats.enums import Artist, Season
+from cosmo_stats.enums import Artist, Season, StatsOutput
 from cosmo_stats.objekts.service import default_objekt_service
 from cosmo_stats.signals import register_signal_handlers
 
@@ -13,6 +13,7 @@ class CosmoStatsArgsNamespace:
     artist: Artist
     season: Season
     collection_no: str | None
+    output: StatsOutput
 
 
 def main() -> None:
@@ -37,6 +38,14 @@ def main() -> None:
         type=str.upper,
         help="The collections to collect data for, e.g. 117Z,118Z,119Z,120Z",
     )
+    parser.add_argument(
+        "-o",
+        "--output",
+        choices=[report.value for report in StatsOutput],
+        default=StatsOutput.TERM,
+        type=str.lower,
+        help="Outputs statistics in the provided format (defaults to term)",
+    )
     parser.parse_args(sys.argv[1:], namespace=CosmoStatsArgsNamespace)
 
     if args.collection_no is None:
@@ -54,6 +63,6 @@ def main() -> None:
 
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
-            args.artist, args.season, args.collection_no
+            args.artist, args.season, args.collection_no, args.output
         )
     )

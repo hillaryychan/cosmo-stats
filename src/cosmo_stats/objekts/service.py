@@ -5,7 +5,7 @@ import pandas as pd
 
 from cosmo_stats.clients.apollo_client import ApolloApiClient, default_apollo_api_client
 from cosmo_stats.clients.models import Objekt
-from cosmo_stats.enums import Artist, Season
+from cosmo_stats.enums import Artist, Season, StatsOutput
 from cosmo_stats.objekts.models import ObjektCollectionData
 
 
@@ -71,8 +71,25 @@ class ObjektService:
         stats_df.insert(0, "total", stats_df.sum(axis=1))
         return stats_df.sort_values(by="total", ascending=False)
 
+    def _output_objekt_sales_stats(
+        self, stats: pd.DataFrame, output: StatsOutput
+    ) -> None:
+        match output:
+            case StatsOutput.CSV:
+                print(stats.to_csv())
+            case StatsOutput.HTML:
+                print(stats.to_html())
+            case StatsOutput.JSON:
+                print(stats.to_json())
+            case _:
+                print(stats)
+
     async def get_objekt_sales_stats(
-        self, artist: Artist, season: Season, collection_no: str | None
+        self,
+        artist: Artist,
+        season: Season,
+        collection_no: str | None,
+        output: StatsOutput,
     ) -> None:
         objekts = await self._get_objekts(artist, season, collection_no)
         if len(objekts) == 0:
@@ -81,7 +98,7 @@ class ObjektService:
 
         data = await self._get_objekt_collection_data(objekts)
         stats = self._get_objekt_sales_stats_dataframe(data)
-        print(stats)
+        self._output_objekt_sales_stats(stats, output)
 
 
 default_objekt_service = ObjektService(default_apollo_api_client)

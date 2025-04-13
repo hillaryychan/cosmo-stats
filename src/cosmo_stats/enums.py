@@ -56,3 +56,10 @@ class ArtmsMember(StrEnum):
     KIMLIP = "KimLip"
     JINSOUL = "JinSoul"
     CHOERRY = "Choerry"
+
+
+class StatsOutput(StrEnum):
+    TERM = "term"
+    CSV = "csv"
+    HTML = "html"
+    JSON = "json"
