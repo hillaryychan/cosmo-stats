@@ -45,11 +45,11 @@ def main() -> None:
             "This will collect data for all collections in the season."
         )
         while True:
-            confirmation = input("Are you sure you want to do this [Y/n]? ")
+            confirmation = input("Are you sure you want to do this [y/N]? ")
             match confirmation.lower():
                 case "yes" | "y":
                     break
-                case "no" | "n":
+                case "no" | "n" | "":
                     sys.exit()
 
     asyncio.run(
