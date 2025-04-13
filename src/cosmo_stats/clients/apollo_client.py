@@ -1,10 +1,18 @@
-from typing import Any
+from json import JSONDecodeError
+from typing import Any, TypeVar
 from urllib.parse import urlencode, urljoin
 
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPError
+from pydantic import BaseModel, ValidationError
 
 from cosmo_stats.clients.models import ObjektCollectionMetadata, ObjektList
 from cosmo_stats.enums import Artist, Season
+
+T = TypeVar("T", bound=BaseModel)
+
+
+class ApolloClientError(Exception):
+    pass
 
 
 class ApolloApiClient:
@@ -25,6 +33,26 @@ class ApolloApiClient:
             path = f"{path}?{queries}"
         return urljoin(self.base_url, path)
 
+    async def _request(
+        self, method: str, url: str, response_model: type[T], *args: Any, **kwargs: Any
+    ) -> T:
+        try:
+            response = await self._client.request(method, url, *args, **kwargs)
+            response.raise_for_status()
+        except HTTPError as exc:
+            msg = f"HTTP Exception for {exc.request.url} - {exc}"
+            raise ApolloClientError(msg) from exc
+
+        try:
+            data = response.json()
+            return response_model(**data)
+        except (JSONDecodeError, ValidationError) as exc:
+            msg = (
+                "Failed to parse response to model "
+                f"'{response_model.__name__}': {response.content!r}"
+            )
+            raise ApolloClientError(msg) from exc
+
     async def get_objekts(
         self, artist: Artist, season: Season, collection_no: str | None, page: int = 0
     ) -> ObjektList:
@@ -37,17 +65,13 @@ class ApolloApiClient:
             collectionNo=collection_no,
             page=page,
         )
-        resp = await self._client.get(url)
-        data = resp.json()
-        return ObjektList.model_validate(data)
+        return await self._request("GET", url, ObjektList)
 
     async def get_objekt_collection_metadata(
         self, slug: str
     ) -> ObjektCollectionMetadata:
         url = self._url("api", "objekts", "metadata", slug)
-        resp = await self._client.get(url)
-        data = resp.json()
-        return ObjektCollectionMetadata.model_validate(data)
+        return await self._request("GET", url, ObjektCollectionMetadata)
 
 
 default_apollo_api_client = ApolloApiClient()

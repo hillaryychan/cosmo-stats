@@ -3,7 +3,11 @@ from itertools import batched
 
 import pandas as pd
 
-from cosmo_stats.clients.apollo_client import ApolloApiClient, default_apollo_api_client
+from cosmo_stats.clients.apollo_client import (
+    ApolloApiClient,
+    ApolloClientError,
+    default_apollo_api_client,
+)
 from cosmo_stats.clients.models import Objekt
 from cosmo_stats.enums import Artist, Season, StatsOutput
 from cosmo_stats.objekts.models import ObjektCollectionData
@@ -91,14 +95,17 @@ class ObjektService:
         collection_no: str | None,
         output: StatsOutput,
     ) -> None:
-        objekts = await self._get_objekts(artist, season, collection_no)
-        if len(objekts) == 0:
-            print("No objekts found")
-            return
+        try:
+            objekts = await self._get_objekts(artist, season, collection_no)
+            if len(objekts) == 0:
+                print("No objekts found")
+                return
 
-        data = await self._get_objekt_collection_data(objekts)
-        stats = self._get_objekt_sales_stats_dataframe(data)
-        self._output_objekt_sales_stats(stats, output)
+            data = await self._get_objekt_collection_data(objekts)
+            stats = self._get_objekt_sales_stats_dataframe(data)
+            self._output_objekt_sales_stats(stats, output)
+        except ApolloClientError as exc:
+            print(exc)
 
 
 default_objekt_service = ObjektService(default_apollo_api_client)
