@@ -48,8 +48,8 @@ class ApolloApiClient:
             return response_model(**data)
         except (JSONDecodeError, ValidationError) as exc:
             msg = (
-                "Failed to parse response to model "
-                f"'{response_model.__name__}': {response.content!r}"
+                f"Failed to parse {url} response "
+                f"to model '{response_model.__name__}': {exc}"
             )
             raise ApolloClientError(msg) from exc
 
