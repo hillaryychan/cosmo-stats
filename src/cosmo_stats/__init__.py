@@ -25,7 +25,7 @@ def main() -> None:
         "artist",
         choices=[season.value for season in Artist],
         type=str,
-        help="The season of the objekts",
+        help="The artist of the objekts",
     )
     parser.add_argument(
         "season",
@@ -43,7 +43,7 @@ def main() -> None:
         "--edition",
         choices=[edition.value for edition in Edition],
         type=Edition,
-        help="The collections to collect data for, e.g. 117Z,118Z,119Z,120Z",
+        help="The edition to collect data for. There are three editions each season.",
     )
     parser.add_argument(
         "-o",
