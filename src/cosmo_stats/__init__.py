@@ -53,6 +53,12 @@ def main() -> None:
         type=str.lower,
         help="Outputs statistics in the provided format (defaults to term)",
     )
+
+    # Show help text when no args provided
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(2)
+
     parser.parse_args(sys.argv[1:], namespace=CosmoStatsArgsNamespace)
 
     if args.collection_no is None and args.edition is None:
