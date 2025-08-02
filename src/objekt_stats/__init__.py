@@ -94,7 +94,7 @@ def main() -> None:
         default_objekt_service.get_objekt_sales_stats(
             args.artist,
             args.season,
-            args.collection_no or args.edition.collection_no,
+            args.collection_no or (args.edition and args.edition.collection_no),
             args.output,
         )
     )
