@@ -9,7 +9,8 @@ from objekt_stats.clients.apollo_client import (
     default_apollo_api_client,
 )
 from objekt_stats.clients.models import Objekt
-from objekt_stats.enums import Artist, Season, StatsOutput
+from objekt_stats.enums.cli import StatsOutput
+from objekt_stats.enums.cosmo import Artist, Season
 from objekt_stats.objekts.models import ObjektCollectionData
 
 
@@ -44,7 +45,6 @@ class ObjektService:
             )
             data.append(
                 ObjektCollectionData(
-                    season=objekt.season,
                     member=objekt.member,
                     collection_no=objekt.collection_no,
                     total=int(metadata.total),
@@ -63,13 +63,9 @@ class ObjektService:
         objekts_df = pd.DataFrame(
             [objekt_data.model_dump() for objekt_data in objekts_data]
         )
-        # generate collection_id from season and collection number
-        objekts_df["collection_id"] = objekts_df.apply(
-            lambda x: x["season"][0] + x["collection_no"], axis=1
-        )
-        # pivot table s.t. collection_ids are columns
+        # pivot table s.t. collection_nos are columns
         stats_df = pd.pivot_table(
-            objekts_df, values="total", index=["member"], columns=["collection_id"]
+            objekts_df, values="total", index=["member"], columns=["collection_no"]
         )
         # calculate total sales of collection_ids per member
         stats_df.insert(0, "total", stats_df.sum(axis=1))
