@@ -5,6 +5,7 @@ import sys
 from objekt_stats.enums.artms import ArtmsSeason
 from objekt_stats.enums.cli import StatsOutput
 from objekt_stats.enums.cosmo import Artist, Edition, Season
+from objekt_stats.enums.idntt import IdnttSeason
 from objekt_stats.enums.triples import TripleSSeason
 from objekt_stats.objekts.service import default_objekt_service
 from objekt_stats.signals import register_signal_handlers
@@ -24,6 +25,7 @@ ARTIST_SUBPARSERS = frozenset(
     [
         (Artist.TRIPLES, TripleSSeason),
         (Artist.ARTMS, ArtmsSeason),
+        (Artist.IDNTT, IdnttSeason),
     ]
 )
 

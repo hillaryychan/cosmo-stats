@@ -4,6 +4,7 @@ from enum import StrEnum
 class Artist(StrEnum):
     TRIPLES = "tripleS"
     ARTMS = "artms"
+    IDNTT = "idntt"
 
 
 class Season(StrEnum):
