@@ -1,5 +1,5 @@
 [project]
-name = "cosmo-stats"
+name = "objekt-stats"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-cosmo-stats = "cosmo_stats:main"
+objekt-stats = "objekt_stats:main"
 
 [build-system]
 requires = ["hatchling"]

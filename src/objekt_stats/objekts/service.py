@@ -3,14 +3,14 @@ from itertools import batched
 
 import pandas as pd
 
-from cosmo_stats.clients.apollo_client import (
+from objekt_stats.clients.apollo_client import (
     ApolloApiClient,
     ApolloClientError,
     default_apollo_api_client,
 )
-from cosmo_stats.clients.models import Objekt
-from cosmo_stats.enums import Artist, Season, StatsOutput
-from cosmo_stats.objekts.models import ObjektCollectionData
+from objekt_stats.clients.models import Objekt
+from objekt_stats.enums import Artist, Season, StatsOutput
+from objekt_stats.objekts.models import ObjektCollectionData
 
 
 class ObjektService:

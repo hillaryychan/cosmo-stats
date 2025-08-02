@@ -5,8 +5,8 @@ from urllib.parse import urlencode, urljoin
 from httpx import AsyncClient, HTTPError
 from pydantic import BaseModel, ValidationError
 
-from cosmo_stats.clients.models import ObjektCollectionMetadata, ObjektList
-from cosmo_stats.enums import Artist, Season
+from objekt_stats.clients.models import ObjektCollectionMetadata, ObjektList
+from objekt_stats.enums import Artist, Season
 
 T = TypeVar("T", bound=BaseModel)
 
