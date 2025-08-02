@@ -1,9 +1,7 @@
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
-
-from objekt_stats.enums import ArtmsMember, ObjektClass, Season, TripleSMember
 
 
 class ApiModel(BaseModel):
@@ -15,11 +13,8 @@ class Objekt(ApiModel):
     id: UUID
     slug: str
     collection_id: str
-    season: Season
-    member: TripleSMember | ArtmsMember
+    member: str
     collection_no: str
-    objekt_class: ObjektClass = Field(alias="class")
-    como_amount: int
 
 
 class ObjektList(ApiModel):

@@ -6,7 +6,7 @@ from httpx import AsyncClient, HTTPError
 from pydantic import BaseModel, ValidationError
 
 from objekt_stats.clients.models import ObjektCollectionMetadata, ObjektList
-from objekt_stats.enums import Artist, Season
+from objekt_stats.enums.cosmo import Artist, Season
 
 T = TypeVar("T", bound=BaseModel)
 
