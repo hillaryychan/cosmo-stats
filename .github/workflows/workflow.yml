@@ -1,4 +1,4 @@
-name: cosmo-stats
+name: objekt-stats
 
 on:
   push:

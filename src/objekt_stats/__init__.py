@@ -2,9 +2,9 @@ import argparse
 import asyncio
 import sys
 
-from cosmo_stats.enums import Artist, Edition, Season, StatsOutput
-from cosmo_stats.objekts.service import default_objekt_service
-from cosmo_stats.signals import register_signal_handlers
+from objekt_stats.enums import Artist, Edition, Season, StatsOutput
+from objekt_stats.objekts.service import default_objekt_service
+from objekt_stats.signals import register_signal_handlers
 
 register_signal_handlers()
 
@@ -20,7 +20,7 @@ class CosmoStatsArgsNamespace:
 def main() -> None:
     args = CosmoStatsArgsNamespace()
 
-    parser = argparse.ArgumentParser(prog="cosmo-stats")
+    parser = argparse.ArgumentParser(prog="objekt-stats")
     parser.add_argument(
         "artist",
         choices=[season.value for season in Artist],

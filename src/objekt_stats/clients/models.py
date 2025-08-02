@@ -3,7 +3,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 from pydantic.alias_generators import to_camel
 
-from cosmo_stats.enums import ArtmsMember, ObjektClass, Season, TripleSMember
+from objekt_stats.enums import ArtmsMember, ObjektClass, Season, TripleSMember
 
 
 class ApiModel(BaseModel):
