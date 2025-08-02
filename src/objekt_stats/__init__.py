@@ -12,7 +12,7 @@ from objekt_stats.signals import register_signal_handlers
 register_signal_handlers()
 
 
-class CosmoStatsArgsNamespace:
+class ObjektStatsArgsNamespace:
     artist: Artist
     season: Season
     collection_no: str | None
@@ -29,7 +29,7 @@ ARTIST_SUBPARSERS = frozenset(
 
 
 def main() -> None:
-    args = CosmoStatsArgsNamespace()
+    args = ObjektStatsArgsNamespace()
 
     parser = argparse.ArgumentParser(prog="objekt-stats")
     artist_subparser = parser.add_subparsers(
@@ -71,7 +71,7 @@ def main() -> None:
         parser.print_help(sys.stderr)
         sys.exit(2)
 
-    parser.parse_args(sys.argv[1:], namespace=CosmoStatsArgsNamespace)
+    parser.parse_args(sys.argv[1:], namespace=ObjektStatsArgsNamespace)
 
     if args.collection_no is None and args.edition is None:
         print(
