@@ -18,6 +18,7 @@ class ObjektStatsArgsNamespace:
     season: Season
     collection_no: str | None
     edition: Edition
+    full: bool
     output: StatsOutput
 
 
@@ -60,6 +61,11 @@ def main() -> None:
             ),
         )
         artist_parser.add_argument(
+            "--full",
+            action="store_true",
+            help="Show full statistics.",
+        )
+        artist_parser.add_argument(
             "-o",
             "--output",
             choices=[report.value for report in StatsOutput],
@@ -92,9 +98,11 @@ def main() -> None:
 
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
-            args.artist,
-            args.season,
-            args.collection_no or (args.edition and args.edition.collection_no),
-            args.output,
+            artist=args.artist,
+            season=args.season,
+            collection_no=args.collection_no
+            or (args.edition and args.edition.collection_no),
+            show_full_stats=args.full,
+            output=args.output,
         )
     )
