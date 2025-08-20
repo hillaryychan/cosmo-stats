@@ -58,21 +58,34 @@ class ObjektService:
         return data
 
     def _get_objekt_sales_stats_dataframe(
-        self, objekts_data: list[ObjektCollectionData]
+        self,
+        objekts_data: list[ObjektCollectionData],
+        show_full_stats: bool,  # noqa: FBT001
     ) -> pd.DataFrame:
         objekts_df = pd.DataFrame(
             [objekt_data.model_dump() for objekt_data in objekts_data]
         )
         # pivot table s.t. collection_nos are columns
-        stats_df = pd.pivot_table(
+        objekts_df = pd.pivot_table(
             objekts_df, values="total", index=["member"], columns=["collection_no"]
         )
-        # calculate total sales of collection_ids per member
-        stats_df.insert(0, "total", stats_df.sum(axis=1))
-        sorted_df = stats_df.sort_values(by="total", ascending=False)
-        # calculate total sales per objekt
-        sorted_df.loc["total"] = sorted_df.sum(axis=0)
-        return sorted_df
+        results_df = objekts_df.copy()
+
+        # calculate total objekts per member
+        results_df.insert(0, "total", objekts_df.sum(axis=1))
+        results_df = results_df.sort_values(by="total", ascending=False)
+
+        # add additional stats
+        if show_full_stats:
+            results_df.insert(1, "min", objekts_df.min(axis=1))
+            results_df.insert(1, "max", objekts_df.max(axis=1))
+            results_df.insert(1, "median", objekts_df.median(axis=1))
+            results_df.insert(1, "mean", objekts_df.mean(axis=1))
+
+        # calculate total of each column
+        results_df.loc["total"] = results_df.sum(axis=0)
+
+        return results_df
 
     def _output_objekt_sales_stats(
         self, stats: pd.DataFrame, output: StatsOutput
@@ -92,6 +105,7 @@ class ObjektService:
         artist: Artist,
         season: Season,
         collection_no: str | None,
+        show_full_stats: bool,  # noqa: FBT001
         output: StatsOutput,
     ) -> None:
         try:
@@ -101,7 +115,7 @@ class ObjektService:
                 return
 
             data = await self._get_objekt_collection_data(objekts)
-            stats = self._get_objekt_sales_stats_dataframe(data)
+            stats = self._get_objekt_sales_stats_dataframe(data, show_full_stats)
             self._output_objekt_sales_stats(stats, output)
         except ApolloClientError as exc:
             print(exc)
