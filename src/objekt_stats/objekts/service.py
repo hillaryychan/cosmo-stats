@@ -69,7 +69,10 @@ class ObjektService:
         )
         # calculate total sales of collection_ids per member
         stats_df.insert(0, "total", stats_df.sum(axis=1))
-        return stats_df.sort_values(by="total", ascending=False)
+        sorted_df = stats_df.sort_values(by="total", ascending=False)
+        # calculate total sales per objekt
+        sorted_df.loc["total"] = sorted_df.sum(axis=0)
+        return sorted_df
 
     def _output_objekt_sales_stats(
         self, stats: pd.DataFrame, output: StatsOutput
