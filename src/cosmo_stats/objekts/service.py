@@ -69,7 +69,7 @@ class ObjektService:
         objekts_df = pd.pivot_table(
             objekts_df, values="total", index=["member"], columns=["collection_no"]
         )
-        results_df = objekts_df.copy()
+        results_df = objekts_df.copy().fillna(0)
 
         # calculate total objekts per member
         results_df.insert(0, "total", objekts_df.sum(axis=1))
