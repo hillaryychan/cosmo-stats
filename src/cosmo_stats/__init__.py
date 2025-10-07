@@ -2,13 +2,13 @@ import argparse
 import asyncio
 import sys
 
-from objekt_stats.enums.artms import ArtmsSeason
-from objekt_stats.enums.cli import StatsOutput
-from objekt_stats.enums.cosmo import Artist, Edition, Season
-from objekt_stats.enums.idntt import IdnttSeason
-from objekt_stats.enums.triples import TripleSSeason
-from objekt_stats.objekts.service import default_objekt_service
-from objekt_stats.signals import register_signal_handlers
+from cosmo_stats.enums.artms import ArtmsSeason
+from cosmo_stats.enums.cli import StatsOutput
+from cosmo_stats.enums.cosmo import Artist, Edition, Season
+from cosmo_stats.enums.idntt import IdnttSeason
+from cosmo_stats.enums.triples import TripleSSeason
+from cosmo_stats.objekts.service import default_objekt_service
+from cosmo_stats.signals import register_signal_handlers
 
 register_signal_handlers()
 
@@ -34,9 +34,9 @@ ARTIST_SUBPARSERS = frozenset(
 def main() -> None:
     args = ObjektStatsArgsNamespace()
 
-    parser = argparse.ArgumentParser(prog="objekt-stats")
+    parser = argparse.ArgumentParser(prog="cosmo-stats")
     artist_subparser = parser.add_subparsers(
-        dest="artist", help="Artist to run objekt-stats on."
+        dest="artist", help="Artist to run cosmo-stats on."
     )
     for artist, season_enum in ARTIST_SUBPARSERS:
         artist_parser = artist_subparser.add_parser(artist.value)

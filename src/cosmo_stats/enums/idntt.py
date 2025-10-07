@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-from objekt_stats.enums.cosmo import Season
+from cosmo_stats.enums.cosmo import Season
 
 
 class IdnttSeason(Season):
