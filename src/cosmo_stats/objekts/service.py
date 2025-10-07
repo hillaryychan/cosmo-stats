@@ -60,7 +60,7 @@ class ObjektService:
     def _get_objekt_sales_stats_dataframe(
         self,
         objekts_data: list[ObjektCollectionData],
-        show_full_stats: bool,  # noqa: FBT001
+        show_full_stats: bool,
     ) -> pd.DataFrame:
         objekts_df = pd.DataFrame(
             [objekt_data.model_dump() for objekt_data in objekts_data]
@@ -105,7 +105,7 @@ class ObjektService:
         artist: Artist,
         season: Season,
         collection_no: str | None,
-        show_full_stats: bool,  # noqa: FBT001
+        show_full_stats: bool,
         output: StatsOutput,
     ) -> None:
         try:
