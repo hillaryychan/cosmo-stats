@@ -19,7 +19,7 @@ class ObjektService:
         self._api_client = api_client
 
     async def _get_objekts(
-        self, artist: Artist, season: Season, collection_no: str | None
+        self, artist: Artist, season: Season, collection_no: list[str] | None
     ) -> list[Objekt]:
         objekts = []
         page = 0
@@ -104,12 +104,11 @@ class ObjektService:
         self,
         artist: Artist,
         season: Season,
-        collection_no: str | None,
+        collection_no: list[str] | None,
         show_full_stats: bool,
         output: StatsOutput,
     ) -> None:
         try:
-            print(collection_no)
             objekts = await self._get_objekts(artist, season, collection_no)
             if len(objekts) == 0:
                 print("No objekts found")

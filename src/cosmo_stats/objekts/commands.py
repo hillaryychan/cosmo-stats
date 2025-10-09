@@ -27,7 +27,7 @@ app = typer.Typer(
 
 
 def _validate_collection_no_and_edition(
-    collection_no: str | None, edition: Edition | None
+    collection_no: list[str] | None, edition: Edition | None
 ) -> None:
     if collection_no is None and edition is None:
         print(
@@ -47,8 +47,15 @@ def _validate_collection_no_and_edition(
         raise typer.BadParameter(msg)
 
 
-def _to_upper_callback(val: str) -> str:
-    return val.upper()
+def _parse_collection_nos(values: list[str] | None) -> list[str] | None:
+    if values is None:
+        return None
+
+    result = []
+    for v in values:
+        result.extend(v.split(","))
+    # prune out empty strings with `if x.strip()`
+    return [x.strip().upper() for x in result if x.strip()]
 
 
 @app.command(name="tripleS")
@@ -57,8 +64,8 @@ def tripleS(  # noqa: N802
         TripleSSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
     ],
     collection_no: Annotated[
-        str | None,
-        typer.Option(callback=_to_upper_callback, help=COLLECTION_NO_HELP_TEXT),
+        list[str] | None,
+        typer.Option(callback=_parse_collection_nos, help=COLLECTION_NO_HELP_TEXT),
     ] = None,
     edition: Annotated[Edition | None, typer.Option(help=EDITION_HELP_TEXT)] = None,
     full: Annotated[bool, typer.Option(help=FULL_STATISTICS_HELP_TEXT)] = False,
@@ -67,11 +74,14 @@ def tripleS(  # noqa: N802
     ] = StatsOutput.TERM,
 ) -> None:
     _validate_collection_no_and_edition(collection_no, edition)
+    final_collection_no = collection_no or (
+        edition.collection_no if edition and edition.collection_no is not None else None
+    )
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
             artist=Artist.TRIPLES,
             season=season,
-            collection_no=collection_no or (edition and edition.collection_no),
+            collection_no=final_collection_no,
             show_full_stats=full,
             output=output,
         )
@@ -84,8 +94,8 @@ def artms(
         ArtmsSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
     ],
     collection_no: Annotated[
-        str | None,
-        typer.Option(callback=_to_upper_callback, help=COLLECTION_NO_HELP_TEXT),
+        list[str] | None,
+        typer.Option(callback=_parse_collection_nos, help=COLLECTION_NO_HELP_TEXT),
     ] = None,
     edition: Annotated[Edition | None, typer.Option(help=EDITION_HELP_TEXT)] = None,
     full: Annotated[bool, typer.Option(help=FULL_STATISTICS_HELP_TEXT)] = False,
@@ -94,11 +104,14 @@ def artms(
     ] = StatsOutput.TERM,
 ) -> None:
     _validate_collection_no_and_edition(collection_no, edition)
+    final_collection_no = collection_no or (
+        edition.collection_no if edition and edition.collection_no is not None else None
+    )
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
             artist=Artist.ARTMS,
             season=season,
-            collection_no=collection_no or (edition and edition.collection_no),
+            collection_no=final_collection_no,
             show_full_stats=full,
             output=output,
         )
@@ -111,8 +124,8 @@ def idntt(
         IdnttSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
     ],
     collection_no: Annotated[
-        str | None,
-        typer.Option(callback=_to_upper_callback, help=COLLECTION_NO_HELP_TEXT),
+        list[str] | None,
+        typer.Option(callback=_parse_collection_nos, help=COLLECTION_NO_HELP_TEXT),
     ] = None,
     full: Annotated[bool, typer.Option(help=FULL_STATISTICS_HELP_TEXT)] = False,
     output: Annotated[
