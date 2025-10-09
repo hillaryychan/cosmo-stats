@@ -3,19 +3,23 @@ from typing import Annotated
 
 import typer
 
-from cosmo_stats.commands.constants import (
-    COLLECTION_NO_HELP_TEXT,
-    EDITION_HELP_TEXT,
-    FULL_STATISTICS_HELP_TEXT,
-    OUTPUT_HELP_TEXT,
-    SEASON_HELP_TEXT,
-)
 from cosmo_stats.enums.artms import ArtmsSeason
 from cosmo_stats.enums.cli import StatsOutput
 from cosmo_stats.enums.cosmo import Artist, Edition
 from cosmo_stats.enums.idntt import IdnttSeason
 from cosmo_stats.enums.triples import TripleSSeason
 from cosmo_stats.objekts.service import default_objekt_service
+
+COLLECTION_NO_HELP_TEXT = (
+    "The collections to collect data for, e.g. 117Z,118Z,119Z,120Z"
+)
+EDITION_HELP_TEXT = (
+    "The edition to collect data for. There are three editions each season."
+)
+FULL_STATISTICS_HELP_TEXT = "Show full statistics."
+OUTPUT_HELP_TEXT = "Outputs statistics in the provided format."
+SEASON_HELP_TEXT = "The season of the objekts."
+
 
 app = typer.Typer(
     no_args_is_help=True, help="Retrieve objekt statistics for an artist."
@@ -43,13 +47,18 @@ def _validate_collection_no_and_edition(
         raise typer.BadParameter(msg)
 
 
+def _to_upper_callback(val: str) -> str:
+    return val.upper()
+
+
 @app.command(name="tripleS")
 def tripleS(  # noqa: N802
     season: Annotated[
         TripleSSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
     ],
     collection_no: Annotated[
-        str | None, typer.Option(help=COLLECTION_NO_HELP_TEXT)
+        str | None,
+        typer.Option(callback=_to_upper_callback, help=COLLECTION_NO_HELP_TEXT),
     ] = None,
     edition: Annotated[Edition | None, typer.Option(help=EDITION_HELP_TEXT)] = None,
     full: Annotated[bool, typer.Option(help=FULL_STATISTICS_HELP_TEXT)] = False,
@@ -75,7 +84,8 @@ def artms(
         ArtmsSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
     ],
     collection_no: Annotated[
-        str | None, typer.Option(help=COLLECTION_NO_HELP_TEXT)
+        str | None,
+        typer.Option(callback=_to_upper_callback, help=COLLECTION_NO_HELP_TEXT),
     ] = None,
     edition: Annotated[Edition | None, typer.Option(help=EDITION_HELP_TEXT)] = None,
     full: Annotated[bool, typer.Option(help=FULL_STATISTICS_HELP_TEXT)] = False,
@@ -101,7 +111,8 @@ def idntt(
         IdnttSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
     ],
     collection_no: Annotated[
-        str | None, typer.Option(help=COLLECTION_NO_HELP_TEXT)
+        str | None,
+        typer.Option(callback=_to_upper_callback, help=COLLECTION_NO_HELP_TEXT),
     ] = None,
     full: Annotated[bool, typer.Option(help=FULL_STATISTICS_HELP_TEXT)] = False,
     output: Annotated[

@@ -109,6 +109,7 @@ class ObjektService:
         output: StatsOutput,
     ) -> None:
         try:
+            print(collection_no)
             objekts = await self._get_objekts(artist, season, collection_no)
             if len(objekts) == 0:
                 print("No objekts found")
