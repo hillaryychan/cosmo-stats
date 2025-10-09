@@ -36,7 +36,7 @@ def _validate_collection_no_and_edition(
         )
         while True:
             confirmation = input("Are you sure you want to do this [y/N]? ")
-            match confirmation.lower():
+            match confirmation.lower().strip():
                 case "yes" | "y":
                     break
                 case "no" | "n" | "":
