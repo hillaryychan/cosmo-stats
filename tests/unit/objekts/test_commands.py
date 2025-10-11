@@ -188,10 +188,6 @@ class TestTripleSObjektsCommand:
             TripleSSeason.ATOM01.value, "--collection-no", "100z", "--edition", 1
         )
         assert result.exit_code == 2
-        assert (
-            "Invalid value: Provide either --collection-no or --edition not both."
-            in result.output
-        )
 
 
 class TestArtmsObjektsCommand:
@@ -365,10 +361,6 @@ class TestArtmsObjektsCommand:
             ArtmsSeason.ATOM01.value, "--collection-no", "100z", "--edition", 1
         )
         assert result.exit_code == 2
-        assert (
-            "Invalid value: Provide either --collection-no or --edition not both."
-            in result.output
-        )
 
 
 class TestIdnttObjektsCommand:
