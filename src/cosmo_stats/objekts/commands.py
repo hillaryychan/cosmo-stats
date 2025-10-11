@@ -26,21 +26,26 @@ app = typer.Typer(
 )
 
 
+def _confirm_all_collections() -> None:
+    print(
+        "No collections provided. "
+        "This will collect data for all collections in the season."
+    )
+    while True:
+        confirmation = input("Are you sure you want to do this [y/N]? ")
+        match confirmation.lower().strip():
+            case "yes" | "y":
+                break
+            case "no" | "n" | "":
+                print("Aborting.")
+                raise typer.Exit
+
+
 def _validate_collection_no_and_edition(
     collection_no: list[str] | None, edition: Edition | None
 ) -> None:
     if collection_no is None and edition is None:
-        print(
-            "No collections provided. "
-            "This will collect data for all collections in the season."
-        )
-        while True:
-            confirmation = input("Are you sure you want to do this [y/N]? ")
-            match confirmation.lower():
-                case "yes" | "y":
-                    break
-                case "no" | "n" | "":
-                    raise typer.Exit
+        _confirm_all_collections()
 
     if collection_no is not None and edition is not None:
         msg = "Provide either --collection-no or --edition not both."
@@ -132,6 +137,8 @@ def idntt(
         StatsOutput, typer.Option(case_sensitive=False, help=OUTPUT_HELP_TEXT)
     ] = StatsOutput.TERM,
 ) -> None:
+    if collection_no is None:
+        _confirm_all_collections()
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
             artist=Artist.IDNTT,

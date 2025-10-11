@@ -27,3 +27,6 @@ jobs:
 
       - name: Lint
         run: uv run pre-commit run --all-files
+
+      - name: Test
+        run: uv run pytest -v
