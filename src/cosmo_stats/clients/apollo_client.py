@@ -54,7 +54,11 @@ class ApolloApiClient:
             raise ApolloClientError(msg) from exc
 
     async def get_objekts(
-        self, artist: Artist, season: Season, collection_no: str | None, page: int = 0
+        self,
+        artist: Artist,
+        season: Season,
+        collection_no: list[str] | None,
+        page: int = 0,
     ) -> ObjektList:
         url = self._url(
             "api",
@@ -62,7 +66,7 @@ class ApolloApiClient:
             sort="newest",
             artist=artist,
             season=season,
-            collectionNo=collection_no,
+            collectionNo=",".join(collection_no) if collection_no is not None else None,
             page=page,
         )
         return await self._request("GET", url, ObjektList)
