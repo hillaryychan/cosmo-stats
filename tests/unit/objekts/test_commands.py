@@ -80,6 +80,25 @@ class TestTripleSObjektsCommand:
             output=StatsOutput.TERM,
         )
 
+    def test_invoke_with_collection_no_sorted(
+        self, mock_objekt_service: MagicMock
+    ) -> None:
+        result = self._invoke(
+            TripleSSeason.ATOM01.value,
+            "--collection-no",
+            "104z,102z,103z",
+            "--collection-no",
+            "101z",
+        )
+        assert result.exit_code == 0
+        mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
+            artist=Artist.TRIPLES,
+            season=TripleSSeason.ATOM01,
+            collection_no=["101Z", "102Z", "103Z", "104Z"],
+            show_full_stats=False,
+            output=StatsOutput.TERM,
+        )
+
     @pytest.mark.parametrize("season", list(TripleSSeason))
     def test_invoke_with_season(
         self, season: TripleSSeason, mock_objekt_service: MagicMock
@@ -104,6 +123,32 @@ class TestTripleSObjektsCommand:
             artist=Artist.TRIPLES,
             season=TripleSSeason.ATOM01,
             collection_no=edition.collection_no,
+            show_full_stats=False,
+            output=StatsOutput.TERM,
+        )
+
+    def test_invoke_with_collection_no_and_edition(
+        self, mock_objekt_service: MagicMock
+    ) -> None:
+        result = self._invoke(
+            TripleSSeason.ATOM01.value, "--collection-no", "100z", "--edition", 1
+        )
+        assert result.exit_code == 0
+
+        mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
+            artist=Artist.TRIPLES,
+            season=TripleSSeason.ATOM01,
+            collection_no=[
+                "100Z",
+                "101Z",
+                "102Z",
+                "103Z",
+                "104Z",
+                "105Z",
+                "106Z",
+                "107Z",
+                "108Z",
+            ],
             show_full_stats=False,
             output=StatsOutput.TERM,
         )
@@ -183,12 +228,6 @@ class TestTripleSObjektsCommand:
         assert result.exit_code == 2
         assert "Invalid value for 'SEASON" in result.output
 
-    def test_fails_when_collection_no_and_edition_provided(self) -> None:
-        result = self._invoke(
-            TripleSSeason.ATOM01.value, "--collection-no", "100z", "--edition", 1
-        )
-        assert result.exit_code == 2
-
 
 class TestArtmsObjektsCommand:
     @staticmethod
@@ -208,6 +247,25 @@ class TestArtmsObjektsCommand:
             artist=Artist.ARTMS,
             season=ArtmsSeason.ATOM01,
             collection_no=["100Z"],
+            show_full_stats=False,
+            output=StatsOutput.TERM,
+        )
+
+    def test_invoke_with_collection_no_sorted(
+        self, mock_objekt_service: MagicMock
+    ) -> None:
+        result = self._invoke(
+            ArtmsSeason.ATOM01.value,
+            "--collection-no",
+            "104z,102z,103z",
+            "--collection-no",
+            "101z",
+        )
+        assert result.exit_code == 0
+        mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
+            artist=Artist.ARTMS,
+            season=ArtmsSeason.ATOM01,
+            collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
         )
@@ -277,6 +335,32 @@ class TestArtmsObjektsCommand:
             artist=Artist.ARTMS,
             season=ArtmsSeason.ATOM01,
             collection_no=edition.collection_no,
+            show_full_stats=False,
+            output=StatsOutput.TERM,
+        )
+
+    def test_invoke_with_collection_no_and_edition(
+        self, mock_objekt_service: MagicMock
+    ) -> None:
+        result = self._invoke(
+            ArtmsSeason.ATOM01.value, "--collection-no", "100z", "--edition", 1
+        )
+        assert result.exit_code == 0
+
+        mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
+            artist=Artist.ARTMS,
+            season=ArtmsSeason.ATOM01,
+            collection_no=[
+                "100Z",
+                "101Z",
+                "102Z",
+                "103Z",
+                "104Z",
+                "105Z",
+                "106Z",
+                "107Z",
+                "108Z",
+            ],
             show_full_stats=False,
             output=StatsOutput.TERM,
         )
@@ -356,12 +440,6 @@ class TestArtmsObjektsCommand:
         assert result.exit_code == 2
         assert "Invalid value for 'SEASON" in result.output
 
-    def test_fails_when_collection_no_and_edition_provided(self) -> None:
-        result = self._invoke(
-            ArtmsSeason.ATOM01.value, "--collection-no", "100z", "--edition", 1
-        )
-        assert result.exit_code == 2
-
 
 class TestIdnttObjektsCommand:
     @staticmethod
@@ -416,6 +494,25 @@ class TestIdnttObjektsCommand:
             "103z ",
             "--collection-no",
             " 104z ",
+        )
+        assert result.exit_code == 0
+        mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
+            artist=Artist.IDNTT,
+            season=IdnttSeason.SPRING25,
+            collection_no=["101Z", "102Z", "103Z", "104Z"],
+            show_full_stats=False,
+            output=StatsOutput.TERM,
+        )
+
+    def test_invoke_with_collection_no_sorted(
+        self, mock_objekt_service: MagicMock
+    ) -> None:
+        result = self._invoke(
+            IdnttSeason.SPRING25.value,
+            "--collection-no",
+            "104z,102z,103z",
+            "--collection-no",
+            "101z",
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
