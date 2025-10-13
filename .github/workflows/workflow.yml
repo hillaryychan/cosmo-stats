@@ -22,14 +22,6 @@ jobs:
         with:
           python-version-file: pyproject.toml
 
-      - name: Cache uv dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-            .venv
-          key: uv-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
-
       - name: Install dependencies
         run: uv sync --frozen
 
@@ -49,14 +41,6 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version-file: pyproject.toml
-
-      - name: Cache uv dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-            .venv
-          key: uv-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
 
       - name: Install dependencies
         run: uv sync --frozen
