@@ -41,15 +41,20 @@ def _confirm_all_collections() -> None:
                 raise typer.Exit
 
 
-def _validate_collection_no_and_edition(
+def _determine_final_collection_no(
     collection_no: list[str] | None, edition: Edition | None
-) -> None:
+) -> list[str] | None:
     if collection_no is None and edition is None:
         _confirm_all_collections()
-
-    if collection_no is not None and edition is not None:
-        msg = "Provide either --collection-no or --edition not both."
-        raise typer.BadParameter(msg)
+        return None
+    edition_collection_no = (
+        edition.collection_no
+        if edition is not None and edition.collection_no is not None
+        else []
+    )
+    collection_no = collection_no or []
+    # remove duplicates and sort in alphanumeric order
+    return sorted(set(collection_no + edition_collection_no))
 
 
 def _parse_collection_nos(values: list[str] | None) -> list[str] | None:
@@ -60,7 +65,7 @@ def _parse_collection_nos(values: list[str] | None) -> list[str] | None:
     for v in values:
         result.extend(v.split(","))
     # prune out empty strings with `if x.strip()`
-    return [x.strip().upper() for x in result if x.strip()]
+    return sorted([x.strip().upper() for x in result if x.strip()])
 
 
 @app.command(name="tripleS")
@@ -78,15 +83,12 @@ def tripleS(  # noqa: N802
         StatsOutput, typer.Option(case_sensitive=False, help=OUTPUT_HELP_TEXT)
     ] = StatsOutput.TERM,
 ) -> None:
-    _validate_collection_no_and_edition(collection_no, edition)
-    final_collection_no = collection_no or (
-        edition.collection_no if edition and edition.collection_no is not None else None
-    )
+    collection_no = _determine_final_collection_no(collection_no, edition)
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
             artist=Artist.TRIPLES,
             season=season,
-            collection_no=final_collection_no,
+            collection_no=collection_no,
             show_full_stats=full,
             output=output,
         )
@@ -108,15 +110,12 @@ def artms(
         StatsOutput, typer.Option(case_sensitive=False, help=OUTPUT_HELP_TEXT)
     ] = StatsOutput.TERM,
 ) -> None:
-    _validate_collection_no_and_edition(collection_no, edition)
-    final_collection_no = collection_no or (
-        edition.collection_no if edition and edition.collection_no is not None else None
-    )
+    collection_no = _determine_final_collection_no(collection_no, edition)
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
             artist=Artist.ARTMS,
             season=season,
-            collection_no=final_collection_no,
+            collection_no=collection_no,
             show_full_stats=full,
             output=output,
         )
