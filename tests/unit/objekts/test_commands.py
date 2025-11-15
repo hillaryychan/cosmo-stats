@@ -226,7 +226,7 @@ class TestTripleSObjektsCommand:
     def test_invalid_season(self) -> None:
         result = self._invoke("season01")
         assert result.exit_code == 2
-        assert "Invalid value for 'SEASON" in result.output
+        assert "'season01' is not one of" in result.output
 
 
 class TestArtmsObjektsCommand:
