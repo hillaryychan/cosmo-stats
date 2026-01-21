@@ -1,4 +1,12 @@
-from cosmo_stats.enums.cosmo import Season
+from cosmo_stats.enums.cosmo import Member, Season
+
+
+class ArtmsMember(Member):
+    HEEJIN = "HeeJin"
+    HASEUL = "HaSeul"
+    KIM_LIP = "Kim Lip"
+    JINSOUL = "JinSoul"
+    CHOERRY = "Choerry"
 
 
 class ArtmsSeason(Season):
