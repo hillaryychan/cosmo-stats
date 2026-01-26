@@ -17,16 +17,17 @@ from cosmo_stats.objekts.service import ObjektService
 runner = CliRunner()
 
 
+@pytest.fixture
+def mock_objekt_service(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch(
+        "cosmo_stats.objekts.commands.default_objekt_service", spec=ObjektService
+    )
+
+
 class TestTripleSObjektsCommand:
     @staticmethod
     def _invoke(*args: Any, **kwargs: Any) -> Result:
         return runner.invoke(app, ["objekts", "tripleS", *args], **kwargs)
-
-    @pytest.fixture(autouse=True)
-    def mock_objekt_service(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch(
-            "cosmo_stats.objekts.commands.default_objekt_service", spec=ObjektService
-        )
 
     def test_invoke_with_collection_no(self, mock_objekt_service: MagicMock) -> None:
         result = self._invoke(TripleSSeason.ATOM01.value, "--collection-no", "100z")
@@ -234,12 +235,6 @@ class TestArtmsObjektsCommand:
     def _invoke(*args: Any, **kwargs: Any) -> Result:
         return runner.invoke(app, ["objekts", "artms", *args], **kwargs)
 
-    @pytest.fixture(autouse=True)
-    def mock_objekt_service(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch(
-            "cosmo_stats.objekts.commands.default_objekt_service", spec=ObjektService
-        )
-
     def test_invoke_with_collection_no(self, mock_objekt_service: MagicMock) -> None:
         result = self._invoke(ArtmsSeason.ATOM01.value, "--collection-no", "100z")
         assert result.exit_code == 0
@@ -445,12 +440,6 @@ class TestIdnttObjektsCommand:
     @staticmethod
     def _invoke(*args: Any, **kwargs: Any) -> Result:
         return runner.invoke(app, ["objekts", "idntt", *args], **kwargs)
-
-    @pytest.fixture(autouse=True)
-    def mock_objekt_service(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch(
-            "cosmo_stats.objekts.commands.default_objekt_service", spec=ObjektService
-        )
 
     def test_invoke_with_collection_no(self, mock_objekt_service: MagicMock) -> None:
         result = self._invoke(IdnttSeason.SPRING25.value, "--collection-no", "100z")
