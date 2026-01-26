@@ -17,8 +17,8 @@ class ApolloClientError(Exception):
 class ApolloApiClient:
     DEFAULT_TIMEOUT = 30.0
 
-    def __init__(self) -> None:
-        self._client = AsyncClient(timeout=self.DEFAULT_TIMEOUT)
+    def __init__(self, client: AsyncClient | None = None) -> None:
+        self._client = client or AsyncClient(timeout=self.DEFAULT_TIMEOUT)
 
     @property
     def base_url(self) -> str:
