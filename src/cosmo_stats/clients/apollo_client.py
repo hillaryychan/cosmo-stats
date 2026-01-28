@@ -5,8 +5,7 @@ from urllib.parse import urlencode, urljoin
 from httpx import AsyncClient, HTTPError
 from pydantic import BaseModel, ValidationError
 
-from cosmo_stats.clients.models import ObjektCollectionMetadata, ObjektList
-from cosmo_stats.enums.cosmo import Artist, Season
+from cosmo_stats.clients.models import ObjektCollectionMetadata
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -18,8 +17,8 @@ class ApolloClientError(Exception):
 class ApolloApiClient:
     DEFAULT_TIMEOUT = 30.0
 
-    def __init__(self) -> None:
-        self._client = AsyncClient(timeout=self.DEFAULT_TIMEOUT)
+    def __init__(self, client: AsyncClient | None = None) -> None:
+        self._client = client or AsyncClient(timeout=self.DEFAULT_TIMEOUT)
 
     @property
     def base_url(self) -> str:
@@ -52,24 +51,6 @@ class ApolloApiClient:
                 f"to model '{response_model.__name__}': {exc}"
             )
             raise ApolloClientError(msg) from exc
-
-    async def get_objekts(
-        self,
-        artist: Artist,
-        season: Season,
-        collection_no: list[str] | None,
-        page: int = 0,
-    ) -> ObjektList:
-        url = self._url(
-            "api",
-            "objekts",
-            sort="newest",
-            artist=artist,
-            season=season,
-            collectionNo=",".join(collection_no) if collection_no is not None else None,
-            page=page,
-        )
-        return await self._request("GET", url, ObjektList)
 
     async def get_objekt_collection_metadata(
         self, slug: str

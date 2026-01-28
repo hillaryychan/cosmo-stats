@@ -6,15 +6,22 @@ from click.testing import Result
 from pytest_mock.plugin import MockerFixture
 from typer.testing import CliRunner
 
-from cosmo_stats.enums.artms import ArtmsSeason
+from cosmo_stats.enums.artms import ArtmsMember, ArtmsSeason
 from cosmo_stats.enums.cli import StatsOutput
-from cosmo_stats.enums.cosmo import Artist, Edition
-from cosmo_stats.enums.idntt import IdnttSeason
-from cosmo_stats.enums.triples import TripleSSeason
+from cosmo_stats.enums.cosmo import Edition
+from cosmo_stats.enums.idntt import IdnttMember, IdnttSeason
+from cosmo_stats.enums.triples import TripleSMember, TripleSSeason
 from cosmo_stats.main import app
 from cosmo_stats.objekts.service import ObjektService
 
 runner = CliRunner()
+
+
+@pytest.fixture
+def mock_objekt_service(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch(
+        "cosmo_stats.objekts.commands.default_objekt_service", spec=ObjektService
+    )
 
 
 class TestTripleSObjektsCommand:
@@ -22,17 +29,11 @@ class TestTripleSObjektsCommand:
     def _invoke(*args: Any, **kwargs: Any) -> Result:
         return runner.invoke(app, ["objekts", "tripleS", *args], **kwargs)
 
-    @pytest.fixture(autouse=True)
-    def mock_objekt_service(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch(
-            "cosmo_stats.objekts.commands.default_objekt_service", spec=ObjektService
-        )
-
     def test_invoke_with_collection_no(self, mock_objekt_service: MagicMock) -> None:
         result = self._invoke(TripleSSeason.ATOM01.value, "--collection-no", "100z")
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -50,7 +51,7 @@ class TestTripleSObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
@@ -73,7 +74,7 @@ class TestTripleSObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
@@ -92,7 +93,7 @@ class TestTripleSObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
@@ -106,7 +107,7 @@ class TestTripleSObjektsCommand:
         result = self._invoke(season.value, "--collection-no", "100z")
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=season,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -120,7 +121,7 @@ class TestTripleSObjektsCommand:
         result = self._invoke(TripleSSeason.ATOM01.value, "--edition", edition.value)
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=edition.collection_no,
             show_full_stats=False,
@@ -136,7 +137,7 @@ class TestTripleSObjektsCommand:
         assert result.exit_code == 0
 
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=[
                 "100Z",
@@ -160,7 +161,7 @@ class TestTripleSObjektsCommand:
         result = self._invoke(TripleSSeason.ATOM01.value, input=input_value)
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=None,
             show_full_stats=False,
@@ -181,7 +182,7 @@ class TestTripleSObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=["100Z"],
             show_full_stats=True,
@@ -196,7 +197,7 @@ class TestTripleSObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -216,7 +217,7 @@ class TestTripleSObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=TripleSSeason.ATOM01,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -234,17 +235,11 @@ class TestArtmsObjektsCommand:
     def _invoke(*args: Any, **kwargs: Any) -> Result:
         return runner.invoke(app, ["objekts", "artms", *args], **kwargs)
 
-    @pytest.fixture(autouse=True)
-    def mock_objekt_service(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch(
-            "cosmo_stats.objekts.commands.default_objekt_service", spec=ObjektService
-        )
-
     def test_invoke_with_collection_no(self, mock_objekt_service: MagicMock) -> None:
         result = self._invoke(ArtmsSeason.ATOM01.value, "--collection-no", "100z")
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -263,7 +258,7 @@ class TestArtmsObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
@@ -281,7 +276,7 @@ class TestArtmsObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
@@ -304,7 +299,7 @@ class TestArtmsObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
@@ -318,7 +313,7 @@ class TestArtmsObjektsCommand:
         result = self._invoke(season.value, "--collection-no", "100z")
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=season,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -332,7 +327,7 @@ class TestArtmsObjektsCommand:
         result = self._invoke(ArtmsSeason.ATOM01.value, "--edition", edition.value)
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=edition.collection_no,
             show_full_stats=False,
@@ -348,7 +343,7 @@ class TestArtmsObjektsCommand:
         assert result.exit_code == 0
 
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=[
                 "100Z",
@@ -372,7 +367,7 @@ class TestArtmsObjektsCommand:
         result = self._invoke(ArtmsSeason.ATOM01.value, input=input_value)
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=None,
             show_full_stats=False,
@@ -393,7 +388,7 @@ class TestArtmsObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=["100Z"],
             show_full_stats=True,
@@ -408,7 +403,7 @@ class TestArtmsObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -428,7 +423,7 @@ class TestArtmsObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=ArtmsSeason.ATOM01,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -446,17 +441,11 @@ class TestIdnttObjektsCommand:
     def _invoke(*args: Any, **kwargs: Any) -> Result:
         return runner.invoke(app, ["objekts", "idntt", *args], **kwargs)
 
-    @pytest.fixture(autouse=True)
-    def mock_objekt_service(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch(
-            "cosmo_stats.objekts.commands.default_objekt_service", spec=ObjektService
-        )
-
     def test_invoke_with_collection_no(self, mock_objekt_service: MagicMock) -> None:
         result = self._invoke(IdnttSeason.SPRING25.value, "--collection-no", "100z")
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=IdnttSeason.SPRING25,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -474,7 +463,7 @@ class TestIdnttObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=IdnttSeason.SPRING25,
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
@@ -497,7 +486,7 @@ class TestIdnttObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=IdnttSeason.SPRING25,
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
@@ -516,7 +505,7 @@ class TestIdnttObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=IdnttSeason.SPRING25,
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
@@ -530,7 +519,7 @@ class TestIdnttObjektsCommand:
         result = self._invoke(season.value, "--collection-no", "100z")
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=season,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -544,7 +533,7 @@ class TestIdnttObjektsCommand:
         result = self._invoke(IdnttSeason.SPRING25.value, input=input_value)
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=IdnttSeason.SPRING25,
             collection_no=None,
             show_full_stats=False,
@@ -565,7 +554,7 @@ class TestIdnttObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=IdnttSeason.SPRING25,
             collection_no=["100Z"],
             show_full_stats=True,
@@ -580,7 +569,7 @@ class TestIdnttObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=IdnttSeason.SPRING25,
             collection_no=["100Z"],
             show_full_stats=False,
@@ -600,7 +589,7 @@ class TestIdnttObjektsCommand:
         )
         assert result.exit_code == 0
         mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=IdnttSeason.SPRING25,
             collection_no=["100Z"],
             show_full_stats=False,

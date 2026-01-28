@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import asdict
 from itertools import batched
 
 import pandas as pd
@@ -8,48 +9,27 @@ from cosmo_stats.clients.apollo_client import (
     ApolloClientError,
     default_apollo_api_client,
 )
-from cosmo_stats.clients.models import Objekt
 from cosmo_stats.enums.cli import StatsOutput
-from cosmo_stats.enums.cosmo import Artist, Season
-from cosmo_stats.objekts.models import ObjektCollectionData
+from cosmo_stats.enums.cosmo import Member, Season
+from cosmo_stats.objekts.models import Objekt
 
 
 class ObjektService:
     def __init__(self, api_client: ApolloApiClient) -> None:
         self._api_client = api_client
 
-    async def _get_objekts(
-        self, artist: Artist, season: Season, collection_no: list[str] | None
-    ) -> list[Objekt]:
-        objekts = []
-        page = 0
-        while True:
-            resp = await self._api_client.get_objekts(
-                artist, season, collection_no, page
-            )
-            objekts.extend(resp.objekts)
-            if not resp.has_next or resp.next_start_after is None:
-                break
-            page = resp.next_start_after
-
-        return objekts
-
-    async def _get_objekt_collection_data(
+    async def _get_objekt_collection_data_from_slug(
         self, objekts: list[Objekt]
-    ) -> list[ObjektCollectionData]:
+    ) -> list[Objekt]:
         data = []
 
         async def get_objekt_collection_data_task(objekt: Objekt) -> None:
             metadata = await self._api_client.get_objekt_collection_metadata(
                 objekt.slug
             )
-            data.append(
-                ObjektCollectionData(
-                    member=objekt.member,
-                    collection_no=objekt.collection_no,
-                    total=int(metadata.total),
-                )
-            )
+
+            objekt.total = int(metadata.total)
+            data.append(objekt)
 
         for batch in batched(objekts, 100, strict=False):
             tasks = map(get_objekt_collection_data_task, batch)
@@ -59,12 +39,10 @@ class ObjektService:
 
     def _get_objekt_sales_stats_dataframe(
         self,
-        objekts_data: list[ObjektCollectionData],
+        objekts_data: list[Objekt],
         show_full_stats: bool,
     ) -> pd.DataFrame:
-        objekts_df = pd.DataFrame(
-            [objekt_data.model_dump() for objekt_data in objekts_data]
-        )
+        objekts_df = pd.DataFrame([asdict(objekt_data) for objekt_data in objekts_data])
         # pivot table s.t. collection_nos are columns
         objekts_df = pd.pivot_table(
             objekts_df, values="total", index=["member"], columns=["collection_no"]
@@ -102,19 +80,20 @@ class ObjektService:
 
     async def get_objekt_sales_stats(
         self,
-        artist: Artist,
+        member_enum_cls: type[Member],
         season: Season,
         collection_no: list[str] | None,
         show_full_stats: bool,
         output: StatsOutput,
     ) -> None:
         try:
-            objekts = await self._get_objekts(artist, season, collection_no)
-            if len(objekts) == 0:
-                print("No objekts found")
-                return
+            objekts = [
+                Objekt(season=season, member=member, collection_no=collection)
+                for member in member_enum_cls
+                for collection in collection_no or []
+            ]
 
-            data = await self._get_objekt_collection_data(objekts)
+            data = await self._get_objekt_collection_data_from_slug(objekts)
             stats = self._get_objekt_sales_stats_dataframe(data, show_full_stats)
             self._output_objekt_sales_stats(stats, output)
         except ApolloClientError as exc:

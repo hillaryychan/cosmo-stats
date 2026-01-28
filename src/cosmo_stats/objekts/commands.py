@@ -3,11 +3,11 @@ from typing import Annotated
 
 import typer
 
-from cosmo_stats.enums.artms import ArtmsSeason
+from cosmo_stats.enums.artms import ArtmsMember, ArtmsSeason
 from cosmo_stats.enums.cli import StatsOutput
 from cosmo_stats.enums.cosmo import Artist, Edition
-from cosmo_stats.enums.idntt import IdnttSeason
-from cosmo_stats.enums.triples import TripleSSeason
+from cosmo_stats.enums.idntt import IdnttMember, IdnttSeason
+from cosmo_stats.enums.triples import TripleSMember, TripleSSeason
 from cosmo_stats.objekts.service import default_objekt_service
 
 COLLECTION_NO_HELP_TEXT = (
@@ -68,7 +68,7 @@ def _parse_collection_nos(values: list[str] | None) -> list[str] | None:
     return sorted([x.strip().upper() for x in result if x.strip()])
 
 
-@app.command(name="tripleS")
+@app.command(name=Artist.TRIPLES.value)
 def tripleS(  # noqa: N802
     season: Annotated[
         TripleSSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
@@ -86,7 +86,7 @@ def tripleS(  # noqa: N802
     collection_no = _determine_final_collection_no(collection_no, edition)
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
-            artist=Artist.TRIPLES,
+            member_enum_cls=TripleSMember,
             season=season,
             collection_no=collection_no,
             show_full_stats=full,
@@ -113,7 +113,7 @@ def artms(
     collection_no = _determine_final_collection_no(collection_no, edition)
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
-            artist=Artist.ARTMS,
+            member_enum_cls=ArtmsMember,
             season=season,
             collection_no=collection_no,
             show_full_stats=full,
@@ -140,7 +140,7 @@ def idntt(
         _confirm_all_collections()
     asyncio.run(
         default_objekt_service.get_objekt_sales_stats(
-            artist=Artist.IDNTT,
+            member_enum_cls=IdnttMember,
             season=season,
             collection_no=collection_no,
             show_full_stats=full,

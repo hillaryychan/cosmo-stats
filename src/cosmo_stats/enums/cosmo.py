@@ -7,8 +7,20 @@ class Artist(StrEnum):
     IDNTT = "idntt"
 
 
+class Member(StrEnum):
+    """The base member enum for each artist."""
+
+    @property
+    def slug(self) -> str:
+        return self.value.replace(" ", "").lower()
+
+
 class Season(StrEnum):
     """The base season enum as every artist has different seasons."""
+
+    @property
+    def slug(self) -> str:
+        return self.value.lower()
 
 
 class Edition(IntEnum):
