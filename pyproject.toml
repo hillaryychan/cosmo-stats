@@ -11,7 +11,7 @@ dependencies = [
     "argparse>=1.4.0",
     "asyncio>=4.0.0",
     "httpx>=0.28.1",
-    "pandas>=3.0.1",
+    "pandas>=3.0.3",
     "pydantic>=2.13.4",
     "typer>=0.25.1",
 ]
