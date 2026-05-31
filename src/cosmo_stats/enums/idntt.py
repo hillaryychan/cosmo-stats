@@ -24,3 +24,4 @@ class IdnttSeason(Season):
     SUMMER25 = "Summer25"
     AUTUMN25 = "Autumn25"
     WINTER26 = "Winter26"
+    SPRING26 = "Spring26"
