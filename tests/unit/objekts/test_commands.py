@@ -2,9 +2,8 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from click.testing import Result
 from pytest_mock.plugin import MockerFixture
-from typer.testing import CliRunner
+from typer.testing import CliRunner, Result
 
 from cosmo_stats.enums.artms import ArtmsMember, ArtmsSeason
 from cosmo_stats.enums.cli import StatsOutput
