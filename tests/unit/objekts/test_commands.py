@@ -226,7 +226,7 @@ class TestTripleSObjektsCommand:
     def test_invalid_season(self) -> None:
         result = self._invoke("season01")
         assert result.exit_code == 2
-        assert "'season01' is not one of" in result.output
+        assert "Invalid value for 'season': 'season01' is not one of" in result.output
 
 
 class TestArtmsObjektsCommand:
@@ -432,7 +432,7 @@ class TestArtmsObjektsCommand:
     def test_invalid_season(self) -> None:
         result = self._invoke("season01")
         assert result.exit_code == 2
-        assert "Invalid value for 'SEASON" in result.output
+        assert "Invalid value for 'season': 'season01' is not one of" in result.output
 
 
 class TestIdnttObjektsCommand:
@@ -598,4 +598,4 @@ class TestIdnttObjektsCommand:
     def test_invalid_season(self) -> None:
         result = self._invoke("season01")
         assert result.exit_code == 2
-        assert "Invalid value for 'SEASON" in result.output
+        assert "Invalid value for 'season': 'season01' is not one of" in result.output
