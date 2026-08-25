@@ -15,3 +15,4 @@ class ArtmsSeason(Season):
     CREAM01 = "Cream01"
     DIVINE01 = "Divine01"
     EVER01 = "Ever01"
+    ATOM02 = "Atom02"
