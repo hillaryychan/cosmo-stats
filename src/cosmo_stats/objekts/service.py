@@ -31,7 +31,7 @@ class ObjektService:
             objekt.total = int(metadata.total)
             data.append(objekt)
 
-        for batch in batched(objekts, 100, strict=False):
+        for batch in batched(objekts, 50, strict=False):
             tasks = map(get_objekt_collection_data_task, batch)
             await asyncio.gather(*tasks)
 
