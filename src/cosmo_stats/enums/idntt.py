@@ -17,6 +17,11 @@ class IdnttMember(Member):
     YEJOON = "YeJoon"
     GYEONGBEEN = "GyeongBeen"
     EUNSOO = "EunSoo"
+    GIWOONG = "GiWoong"
+    JOOHEON = "JooHeon"
+    GYUNGHO = "GyungHo"
+    EUNCHAN = "EunChan"
+    EUNSUNG = "EunSung"
 
 
 class IdnttSeason(Season):
@@ -25,3 +30,4 @@ class IdnttSeason(Season):
     AUTUMN25 = "Autumn25"
     WINTER26 = "Winter26"
     SPRING26 = "Spring26"
+    SUMMER26 = "Summer26"
