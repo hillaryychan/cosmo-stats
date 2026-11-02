@@ -32,7 +32,7 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "pytest-mock>=3.17.0",
     "ruff>=0.17.3",
-    "types-requests>=2.33.0.20260712",
+    "types-requests>=2.33.0.20261006",
 ]
 
 [tool.mypy]
