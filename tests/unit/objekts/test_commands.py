@@ -6,7 +6,7 @@ from pytest_mock.plugin import MockerFixture
 from typer.testing import CliRunner, Result
 
 from cosmo_stats.enums.artms import ArtmsMember, ArtmsSeason
-from cosmo_stats.enums.cli import StatsOutput
+from cosmo_stats.enums.cli import SortOrder, StatsOutput
 from cosmo_stats.enums.cosmo import Edition
 from cosmo_stats.enums.idntt import IdnttMember, IdnttSeason
 from cosmo_stats.enums.triples import TripleSMember, TripleSSeason
@@ -37,6 +37,7 @@ class TestTripleSObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize(
@@ -55,6 +56,7 @@ class TestTripleSObjektsCommand:
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_multiple_collection_no(
@@ -78,6 +80,7 @@ class TestTripleSObjektsCommand:
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_collection_no_sorted(
@@ -97,6 +100,7 @@ class TestTripleSObjektsCommand:
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("season", list(TripleSSeason))
@@ -111,6 +115,7 @@ class TestTripleSObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("edition", list(Edition))
@@ -125,6 +130,7 @@ class TestTripleSObjektsCommand:
             collection_no=edition.collection_no,
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_collection_no_and_edition(
@@ -151,6 +157,7 @@ class TestTripleSObjektsCommand:
             ],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("input_value", ["YES", "yes", " yEs ", "Y", "y"])
@@ -165,6 +172,7 @@ class TestTripleSObjektsCommand:
             collection_no=None,
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("input_value", ["No", "no", " nO ", "N", "n", "\n", " "])
@@ -186,6 +194,7 @@ class TestTripleSObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=True,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_explicit_no_full_stats(
@@ -201,7 +210,41 @@ class TestTripleSObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
+
+    @pytest.mark.parametrize("sort", ["member", "MEMBER", "Member"])
+    def test_invoke_with_sort_by_member(
+        self, sort: str, mock_objekt_service: MagicMock
+    ) -> None:
+        result = self._invoke(
+            TripleSSeason.ATOM01.value,
+            "--collection-no",
+            "100Z",
+            "--sort",
+            sort,
+        )
+        assert result.exit_code == 0
+        mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
+            member_enum_cls=TripleSMember,
+            season=TripleSSeason.ATOM01,
+            collection_no=["100Z"],
+            show_full_stats=False,
+            output=StatsOutput.TERM,
+            sort_order=SortOrder.MEMBER,
+        )
+
+    def test_invoke_with_invalid_sort(self, mock_objekt_service: MagicMock) -> None:
+        result = self._invoke(
+            TripleSSeason.ATOM01.value,
+            "--collection-no",
+            "100Z",
+            "--sort",
+            "invalid",
+        )
+        assert result.exit_code == 2
+        assert "Invalid value for '--sort': 'invalid' is not one of" in result.output
+        mock_objekt_service.get_objekt_sales_stats.assert_not_called()
 
     @pytest.mark.parametrize("stats_output", list(StatsOutput))
     def test_invoke_with_stats_output(
@@ -221,6 +264,7 @@ class TestTripleSObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=stats_output,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invalid_season(self) -> None:
@@ -243,6 +287,7 @@ class TestArtmsObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_collection_no_sorted(
@@ -262,6 +307,7 @@ class TestArtmsObjektsCommand:
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize(
@@ -280,6 +326,7 @@ class TestArtmsObjektsCommand:
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_multiple_collection_no(
@@ -303,6 +350,7 @@ class TestArtmsObjektsCommand:
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("season", list(ArtmsSeason))
@@ -317,6 +365,7 @@ class TestArtmsObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("edition", list(Edition))
@@ -331,6 +380,7 @@ class TestArtmsObjektsCommand:
             collection_no=edition.collection_no,
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_collection_no_and_edition(
@@ -357,6 +407,7 @@ class TestArtmsObjektsCommand:
             ],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("input_value", ["YES", "yes", " yEs ", "Y", "y"])
@@ -371,6 +422,7 @@ class TestArtmsObjektsCommand:
             collection_no=None,
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("input_value", ["No", "no", " nO ", "N", "n", "\n", " "])
@@ -392,6 +444,7 @@ class TestArtmsObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=True,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_explicit_no_full_stats(
@@ -407,7 +460,41 @@ class TestArtmsObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
+
+    @pytest.mark.parametrize("sort", ["member", "MEMBER", "Member"])
+    def test_invoke_with_sort_by_member(
+        self, sort: str, mock_objekt_service: MagicMock
+    ) -> None:
+        result = self._invoke(
+            ArtmsSeason.ATOM01.value,
+            "--collection-no",
+            "100Z",
+            "--sort",
+            sort,
+        )
+        assert result.exit_code == 0
+        mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
+            member_enum_cls=ArtmsMember,
+            season=ArtmsSeason.ATOM01,
+            collection_no=["100Z"],
+            show_full_stats=False,
+            output=StatsOutput.TERM,
+            sort_order=SortOrder.MEMBER,
+        )
+
+    def test_invoke_with_invalid_sort(self, mock_objekt_service: MagicMock) -> None:
+        result = self._invoke(
+            ArtmsSeason.ATOM01.value,
+            "--collection-no",
+            "100Z",
+            "--sort",
+            "invalid",
+        )
+        assert result.exit_code == 2
+        assert "Invalid value for '--sort': 'invalid' is not one of" in result.output
+        mock_objekt_service.get_objekt_sales_stats.assert_not_called()
 
     @pytest.mark.parametrize("stats_output", list(StatsOutput))
     def test_invoke_with_stats_output(
@@ -427,6 +514,7 @@ class TestArtmsObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=stats_output,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invalid_season(self) -> None:
@@ -449,6 +537,7 @@ class TestIdnttObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize(
@@ -467,6 +556,7 @@ class TestIdnttObjektsCommand:
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_multiple_collection_no(
@@ -490,6 +580,7 @@ class TestIdnttObjektsCommand:
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_collection_no_sorted(
@@ -509,6 +600,7 @@ class TestIdnttObjektsCommand:
             collection_no=["101Z", "102Z", "103Z", "104Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("season", list(IdnttSeason))
@@ -523,6 +615,7 @@ class TestIdnttObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("input_value", ["YES", "yes", " yEs ", "Y", "y"])
@@ -537,6 +630,7 @@ class TestIdnttObjektsCommand:
             collection_no=None,
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     @pytest.mark.parametrize("input_value", ["No", "no", " nO ", "N", "n", "\n", " "])
@@ -558,6 +652,7 @@ class TestIdnttObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=True,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invoke_with_explicit_no_full_stats(
@@ -573,7 +668,41 @@ class TestIdnttObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=StatsOutput.TERM,
+            sort_order=SortOrder.TOTAL,
         )
+
+    @pytest.mark.parametrize("sort", ["member", "MEMBER", "Member"])
+    def test_invoke_with_sort_by_member(
+        self, sort: str, mock_objekt_service: MagicMock
+    ) -> None:
+        result = self._invoke(
+            IdnttSeason.SPRING25.value,
+            "--collection-no",
+            "100Z",
+            "--sort",
+            sort,
+        )
+        assert result.exit_code == 0
+        mock_objekt_service.get_objekt_sales_stats.assert_called_once_with(
+            member_enum_cls=IdnttMember,
+            season=IdnttSeason.SPRING25,
+            collection_no=["100Z"],
+            show_full_stats=False,
+            output=StatsOutput.TERM,
+            sort_order=SortOrder.MEMBER,
+        )
+
+    def test_invoke_with_invalid_sort(self, mock_objekt_service: MagicMock) -> None:
+        result = self._invoke(
+            IdnttSeason.SPRING25.value,
+            "--collection-no",
+            "100Z",
+            "--sort",
+            "invalid",
+        )
+        assert result.exit_code == 2
+        assert "Invalid value for '--sort': 'invalid' is not one of" in result.output
+        mock_objekt_service.get_objekt_sales_stats.assert_not_called()
 
     @pytest.mark.parametrize("stats_output", list(StatsOutput))
     def test_invoke_with_stats_output(
@@ -593,6 +722,7 @@ class TestIdnttObjektsCommand:
             collection_no=["100Z"],
             show_full_stats=False,
             output=stats_output,
+            sort_order=SortOrder.TOTAL,
         )
 
     def test_invalid_season(self) -> None:

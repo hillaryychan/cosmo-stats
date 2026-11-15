@@ -9,7 +9,7 @@ from cosmo_stats.clients.apollo_client import (
     ApolloClientError,
     default_apollo_api_client,
 )
-from cosmo_stats.enums.cli import StatsOutput
+from cosmo_stats.enums.cli import SortOrder, StatsOutput
 from cosmo_stats.enums.cosmo import Member, Season
 from cosmo_stats.objekts.models import Objekt
 
@@ -40,9 +40,15 @@ class ObjektService:
     def _get_objekt_sales_stats_dataframe(
         self,
         objekts_data: list[Objekt],
+        member_order: list[Member],
         show_full_stats: bool,
+        sort_order: SortOrder,
     ) -> pd.DataFrame:
         objekts_df = pd.DataFrame([asdict(objekt_data) for objekt_data in objekts_data])
+        # use an ordered categorical so the member enum order is preserved
+        objekts_df["member"] = pd.Categorical(
+            objekts_df["member"], categories=member_order, ordered=True
+        )
         # pivot table s.t. collection_nos are columns
         objekts_df = pd.pivot_table(
             objekts_df, values="total", index=["member"], columns=["collection_no"]
@@ -51,7 +57,11 @@ class ObjektService:
 
         # calculate total objekts per member
         results_df.insert(0, "total", objekts_df.sum(axis=1))
-        results_df = results_df.sort_values(by="total", ascending=False)
+        match sort_order:
+            case SortOrder.MEMBER:
+                results_df = results_df.sort_index()
+            case _:
+                results_df = results_df.sort_values(by="total", ascending=False)
 
         # add additional stats
         if show_full_stats:
@@ -78,13 +88,15 @@ class ObjektService:
             case _:
                 print(stats)
 
-    async def get_objekt_sales_stats(
+    async def get_objekt_sales_stats(  # noqa: PLR0913
         self,
+        *,
         member_enum_cls: type[Member],
         season: Season,
         collection_no: list[str] | None,
         show_full_stats: bool,
         output: StatsOutput,
+        sort_order: SortOrder = SortOrder.TOTAL,
     ) -> None:
         try:
             objekts = [
@@ -94,7 +106,9 @@ class ObjektService:
             ]
 
             data = await self._get_objekt_collection_data_from_slug(objekts)
-            stats = self._get_objekt_sales_stats_dataframe(data, show_full_stats)
+            stats = self._get_objekt_sales_stats_dataframe(
+                data, list(member_enum_cls), show_full_stats, sort_order
+            )
             self._output_objekt_sales_stats(stats, output)
         except ApolloClientError as exc:
             print(exc)
