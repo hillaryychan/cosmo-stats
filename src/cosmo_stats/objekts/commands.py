@@ -4,7 +4,7 @@ from typing import Annotated
 import typer
 
 from cosmo_stats.enums.artms import ArtmsMember, ArtmsSeason
-from cosmo_stats.enums.cli import StatsOutput
+from cosmo_stats.enums.cli import SortOrder, StatsOutput
 from cosmo_stats.enums.cosmo import Artist, Edition
 from cosmo_stats.enums.idntt import IdnttMember, IdnttSeason
 from cosmo_stats.enums.triples import TripleSMember, TripleSSeason
@@ -17,8 +17,9 @@ EDITION_HELP_TEXT = (
     "The edition to collect data for. There are three editions each season."
 )
 FULL_STATISTICS_HELP_TEXT = "Show full statistics."
-OUTPUT_HELP_TEXT = "Outputs statistics in the provided format."
+OUTPUT_HELP_TEXT = "The format to output the statistics in."
 SEASON_HELP_TEXT = "The season of the objekts."
+SORT_HELP_TEXT = "The order to sort the statistics in."
 
 
 app = typer.Typer(
@@ -69,7 +70,8 @@ def _parse_collection_nos(values: list[str] | None) -> list[str] | None:
 
 
 @app.command(name=Artist.TRIPLES.value)
-def tripleS(  # noqa: N802
+def tripleS(  # noqa: N802, PLR0913
+    *,
     season: Annotated[
         TripleSSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
     ],
@@ -82,6 +84,9 @@ def tripleS(  # noqa: N802
     output: Annotated[
         StatsOutput, typer.Option(case_sensitive=False, help=OUTPUT_HELP_TEXT)
     ] = StatsOutput.TERM,
+    sort: Annotated[
+        SortOrder, typer.Option(case_sensitive=False, help=SORT_HELP_TEXT)
+    ] = SortOrder.TOTAL,
 ) -> None:
     collection_no = _determine_final_collection_no(collection_no, edition)
     asyncio.run(
@@ -91,12 +96,14 @@ def tripleS(  # noqa: N802
             collection_no=collection_no,
             show_full_stats=full,
             output=output,
+            sort_order=sort,
         )
     )
 
 
 @app.command()
-def artms(
+def artms(  # noqa: PLR0913
+    *,
     season: Annotated[
         ArtmsSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
     ],
@@ -109,6 +116,9 @@ def artms(
     output: Annotated[
         StatsOutput, typer.Option(case_sensitive=False, help=OUTPUT_HELP_TEXT)
     ] = StatsOutput.TERM,
+    sort: Annotated[
+        SortOrder, typer.Option(case_sensitive=False, help=SORT_HELP_TEXT)
+    ] = SortOrder.TOTAL,
 ) -> None:
     collection_no = _determine_final_collection_no(collection_no, edition)
     asyncio.run(
@@ -118,12 +128,14 @@ def artms(
             collection_no=collection_no,
             show_full_stats=full,
             output=output,
+            sort_order=sort,
         )
     )
 
 
 @app.command()
 def idntt(
+    *,
     season: Annotated[
         IdnttSeason, typer.Argument(case_sensitive=False, help=SEASON_HELP_TEXT)
     ],
@@ -135,6 +147,9 @@ def idntt(
     output: Annotated[
         StatsOutput, typer.Option(case_sensitive=False, help=OUTPUT_HELP_TEXT)
     ] = StatsOutput.TERM,
+    sort: Annotated[
+        SortOrder, typer.Option(case_sensitive=False, help=SORT_HELP_TEXT)
+    ] = SortOrder.TOTAL,
 ) -> None:
     if collection_no is None:
         _confirm_all_collections()
@@ -145,5 +160,6 @@ def idntt(
             collection_no=collection_no,
             show_full_stats=full,
             output=output,
+            sort_order=sort,
         )
     )

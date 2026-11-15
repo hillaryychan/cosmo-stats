@@ -38,6 +38,13 @@ the provided edition:
 cosmo-stats objekts tripleS atom02 --edition 1
 ```
 
+Results are sorted by the cumulative total number of objekts in descending order. To sort by
+member order instead, use `--sort`:
+
+```sh
+cosmo-stats objekts tripleS atom02 --edition 1 --sort member
+```
+
 If you do not provide a collection number or edition, `cosmo-stats` will retrieve data for **all**
 Objekts for the season. This is not recommended as you may get rate limited.
 

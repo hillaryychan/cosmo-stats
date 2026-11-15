@@ -6,3 +6,8 @@ class StatsOutput(StrEnum):
     CSV = "csv"
     HTML = "html"
     JSON = "json"
+
+
+class SortOrder(StrEnum):
+    TOTAL = "total"
+    MEMBER = "member"
