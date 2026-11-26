@@ -37,3 +37,4 @@ class TripleSSeason(Season):
     ATOM02 = "Atom02"
     BINARY02 = "Binary02"
     CREAM02 = "Cream02"
+    DIVINE02 = "Divine02"
