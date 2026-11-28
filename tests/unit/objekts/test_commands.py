@@ -243,7 +243,10 @@ class TestTripleSObjektsCommand:
             "invalid",
         )
         assert result.exit_code == 2
-        assert "Invalid value for '--sort': 'invalid' is not one of" in result.output
+        assert (
+            "Invalid value for '--sort': Value error, 'invalid' is not one of"
+            in result.output
+        )
         mock_objekt_service.get_objekt_sales_stats.assert_not_called()
 
     @pytest.mark.parametrize("stats_output", list(StatsOutput))
@@ -270,7 +273,10 @@ class TestTripleSObjektsCommand:
     def test_invalid_season(self) -> None:
         result = self._invoke("season01")
         assert result.exit_code == 2
-        assert "Invalid value for 'season': 'season01' is not one of" in result.output
+        assert (
+            "Invalid value for 'season': Value error, 'season01' is not one of"
+            in result.output
+        )
 
 
 class TestArtmsObjektsCommand:
@@ -493,7 +499,10 @@ class TestArtmsObjektsCommand:
             "invalid",
         )
         assert result.exit_code == 2
-        assert "Invalid value for '--sort': 'invalid' is not one of" in result.output
+        assert (
+            "Invalid value for '--sort': Value error, 'invalid' is not one of"
+            in result.output
+        )
         mock_objekt_service.get_objekt_sales_stats.assert_not_called()
 
     @pytest.mark.parametrize("stats_output", list(StatsOutput))
@@ -520,7 +529,10 @@ class TestArtmsObjektsCommand:
     def test_invalid_season(self) -> None:
         result = self._invoke("season01")
         assert result.exit_code == 2
-        assert "Invalid value for 'season': 'season01' is not one of" in result.output
+        assert (
+            "Invalid value for 'season': Value error, 'season01' is not one of"
+            in result.output
+        )
 
 
 class TestIdnttObjektsCommand:
@@ -701,7 +713,10 @@ class TestIdnttObjektsCommand:
             "invalid",
         )
         assert result.exit_code == 2
-        assert "Invalid value for '--sort': 'invalid' is not one of" in result.output
+        assert (
+            "Invalid value for '--sort': Value error, 'invalid' is not one of"
+            in result.output
+        )
         mock_objekt_service.get_objekt_sales_stats.assert_not_called()
 
     @pytest.mark.parametrize("stats_output", list(StatsOutput))
@@ -728,4 +743,7 @@ class TestIdnttObjektsCommand:
     def test_invalid_season(self) -> None:
         result = self._invoke("season01")
         assert result.exit_code == 2
-        assert "Invalid value for 'season': 'season01' is not one of" in result.output
+        assert (
+            "Invalid value for 'season': Value error, 'season01' is not one of"
+            in result.output
+        )
